@@ -2,8 +2,17 @@ from model import create_model, compile_model
 from model_utils import create_callbacks
 
 
-def train(X_train, y_train, X_test, y_test, vocab_size, embedding_dim, max_len):
+def train(x_train, y_train, x_valid, y_valid, vocab_size, embedding_dim, max_len):
     """
+        :param x_train:
+        :param y_train:
+        :param x_valid:
+        :param y_valid:
+        :param vocab_size:
+        :param embedding_dim:
+        :param max_len:
+
+        :return:
     """
     # set num filters to 36
     num_filters = 36
@@ -23,10 +32,10 @@ def train(X_train, y_train, X_test, y_test, vocab_size, embedding_dim, max_len):
     use_callbacks = ['ModelCheckpoint', 'TensorBoard', 'EarlyStopping',
                      'ReduceLROnPlateau', 'TerminateOnNaN']
 
-    history = cnn_model.fit(X_train, y_train,
+    history = cnn_model.fit(x_train, y_train,
                             epochs=10,
                             verbose=True,
                             callbacks=create_callbacks(use_callbacks),
-                            validation_data=(X_test, y_test))
+                            validation_data=(x_valid, y_valid))
 
     return cnn_model, history
