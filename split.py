@@ -4,9 +4,11 @@ from sklearn.model_selection import train_test_split
 
 
 def main():
-    with open('data/processed/politifact.json', 'r') as input_file:
+    label = 'gossipcop'
+
+    with open(f'data/processed/{label}.json', 'r') as input_file:
         politifact = json.load(input_file)
-    print(f'politifact: {len(politifact)} samples')
+    print(f'{label}: {len(politifact)} samples')
 
     fake = 0
     real = 0
@@ -38,15 +40,15 @@ def main():
 
     # serializing split sets
     train = {sample['id']: sample for sample in train}
-    with open('data/processed/train.json', 'w') as out_file:
+    with open(f'data/processed/train_{label}.json', 'w') as out_file:
         json.dump(train, out_file, sort_keys=True, indent=2)
 
     valid = {sample['id']: sample for sample in valid}
-    with open('data/processed/valid.json', 'w') as out_file:
+    with open(f'data/processed/valid_{label}.json', 'w') as out_file:
         json.dump(valid, out_file, sort_keys=True, indent=2)
 
     test = {sample['id']: sample for sample in test}
-    with open('data/processed/test.json', 'w') as out_file:
+    with open(f'data/processed/test_{label}.json', 'w') as out_file:
         json.dump(test, out_file, sort_keys=True, indent=2)
 
 
