@@ -38,13 +38,3 @@ def compile_model(model_to_compile, metrics_names):
                              metrics=create_metrics(metrics_names))
 
     return model_to_compile
-
-
-if __name__ == '__main__':
-    test_model = create_model(num_filters=36, vocab_size=5000, embedding_dim=50, maxlen=100)
-
-    use_metrics = ['accuracy', 'TruePositives', 'TrueNegatives',
-                   'FalsePositives', 'FalseNegatives']
-    test_model = compile_model(test_model, use_metrics)
-
-    print(test_model.summary())
