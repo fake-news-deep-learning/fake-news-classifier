@@ -1,9 +1,12 @@
+import tensorflow
+from tensorflow.python import keras
+
 from keras.models import Sequential
 from keras import layers
 from model_utils import create_metrics
 
 
-def create_model(num_filters, vocab_size, embedding_dim, maxlen):
+def create_model(num_filters, input_shape):
     """
         :param num_filters:
         :param vocab_size:
@@ -12,16 +15,19 @@ def create_model(num_filters, vocab_size, embedding_dim, maxlen):
 
         :return:
     """
+    embed_size = input_shape[1]
     model = Sequential()
-    model.add(layers.Embedding(vocab_size, embedding_dim, input_length=maxlen,
-                               name='embedding_layer'))
-
+    model.add(layers.InputLayer(input_shape))
     for kernel_size in [1, 2, 3, 5]:
-        model.add(layers.Conv1D(num_filters, kernel_size,
-                                name=f'conv1d_kernel_{kernel_size}_layer'))
-
+        model.add(layers.Conv2D(
+            num_filters,
+            (kernel_size, embed_size),
+            padding='same',
+            name=f'conv2d_kernel_{kernel_size}_layer'),
+        )
     model.add(layers.Dropout(0.1, name='dropout_layer'))
-    model.add(layers.Dense(1, name='linear_layer'))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(1, name='linear_layer', activation='sigmoid'))
 
     return model
 
