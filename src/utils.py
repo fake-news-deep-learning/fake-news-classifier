@@ -21,48 +21,48 @@ def make_stratified_generator(fake, real, batch_size=16):
             batch_x.append(next(iter_first))
             batch_x.append(next(iter_second))
 
-        yield np.asarray(batch_x, dtype=np.float32), batch_y)
+        yield np.asarray(batch_x, dtype=np.float32), batch_y
 
 
 def get_coefs(word, *arr):
-    return word, np.asarray(arr, dtype = 'float32')
+    return word, np.asarray(arr, dtype='float32')
 
 
 def load_glove(word_index, path):
     print(f'Mapping vocabulary with size {len(word_index)} to sequences')
 
-    max=0
+    max = 0
     for index in word_index.values():
         if index > max:
-            max=index
+            max = index
 
     # parsing GLOVE
     print(f'Parsing GLOVE')
-    embeddings_index=dict(get_coefs(*line.split(" "))
+    embeddings_index = dict(get_coefs(*line.split(" "))
                             for line in tqdm(open(path)))
-    embed_example=next(iter(embeddings_index.values()))
-    embed_size=len(embed_example)
+    embed_example = next(iter(embeddings_index.values()))
+    embed_size = len(embed_example)
     print(f'word2vec embeds have len {embed_size}')
 
     # random initialization for the word2vec matrix
-    emb_mean, emb_std=-0.005838499, 0.48782197
-    embedding_matrix=np.random.normal(
+    emb_mean, emb_std = -0.005838499, 0.48782197
+    embedding_matrix = np.random.normal(
         emb_mean, emb_std, (max, embed_size)
     )
 
-    not_found=0
+    not_found = 0
     print(f'Translating vocabulary')
     for word, i in tqdm(word_index.items()):
 
         # get vec for current `word`, fallbacks to `WORD`
-        embedding_vector=embeddings_index.get(word)
+        embedding_vector = embeddings_index.get(word)
 
         if embedding_vector is not None:
-            embedding_matrix[i]=embedding_vector
+            embedding_matrix[i] = embedding_vector
         else:
-            embedding_vector=embeddings_index.get(word.capitalize())
+            embedding_vector = embeddings_index.get(word.capitalize())
             if embedding_vector is not None:
-                embedding_matrix[i]=embedding_vector
+                embedding_matrix[i] = embedding_vector
             else:
                 not_found += 1
 
