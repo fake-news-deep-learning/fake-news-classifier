@@ -1,13 +1,16 @@
 """Converts the dataset to sequences using word2vec."""
 import json
+
 import numpy as np
+from numpy import ndarray
 from tqdm import tqdm
 from tensorflow.keras.preprocessing.text import Tokenizer
 
 from utils import load_glove
 
 
-def prepare_tokenizer():
+def prepare_tokenizer() -> Tokenizer:
+    """Fits a Keras Tokenizer on the dataset."""
     tkn = Tokenizer()
     dataset = {}
 
@@ -42,42 +45,47 @@ def prepare_tokenizer():
     return tkn
 
 
-def text_to_sequence(text, word_index, word2seq, length=70):
+def text_to_sequence(text, word_index, word2seq, length=70) -> ndarray:
+    """Converts a text to its matrix (embed_size x length) representation."""
+
+    embed_size = len(word2seq[0])
     sequence = []
+
     for word in text.split():
+
         if word in word_index:
             sequence.append(word2seq[word_index[word]])
 
-    w2q_size = len(word2seq[0])
+        # trims long texts
+        if len(sequence) == length:
+            break
 
-    while(len(sequence) < length):
-        sequence.append(np.zeros(w2q_size))
+    # pads short sequences
+    while len(sequence) < length:
+        sequence.append(np.zeros(embed_size))
 
-    sequence = sequence[:70]
-
-    return np.asarray(sequence).reshape(70, 300, 1)
+    return np.asarray(sequence).reshape(length, embed_size, 1)
 
 
-def main():
-
-    tokenizer = prepare_tokenizer()
-    word2seq = load_glove(
-        tokenizer.word_index,
-        '../data/glove.6B/glove.6B.300d.txt'
-    )
-
-    for filename in ['train', 'test', 'valid']:
-
-        with open(f'../data/processed/{filename}.json') as input_file:
-            dataset = json.load(input_file)
-
-        print(f'Converting text from set {filename} to sequences.')
-        for entry_id in tqdm(dataset):
-            entry = dataset[entry_id]
-            sequence = text_to_sequence(
-                entry['text'], tokenizer.word_index, word2seq)
-            dataset[entry_id]['sequence'] = sequence
-            del dataset[entry_id]['text']
-
-        with open(f'../data/interim/{filename}.json', 'w') as out_file:
-            json.dump(dataset, out_file, sort_keys=True, indent=2)
+# def main():
+#     tokenizer = prepare_tokenizer()
+#     word2seq = load_glove(
+#         tokenizer.word_index,
+#         '../data/glove.6B/glove.6B.300d.txt'
+#     )
+#
+#     for filename in ['train', 'test', 'valid']:
+#
+#         with open(f'../data/processed/{filename}.json') as input_file:
+#             dataset = json.load(input_file)
+#
+#         print(f'Converting text from set {filename} to sequences.')
+#         for entry_id in tqdm(dataset):
+#             entry = dataset[entry_id]
+#             sequence = text_to_sequence(
+#                 entry['text'], tokenizer.word_index, word2seq)
+#             dataset[entry_id]['sequence'] = sequence
+#             del dataset[entry_id]['text']
+#
+#         with open(f'../data/interim/{filename}.json', 'w') as out_file:
+#             json.dump(dataset, out_file, sort_keys=True, indent=2)
