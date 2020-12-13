@@ -1,49 +1,62 @@
 import json
+from typing import Tuple
 
 import numpy as np
+from tensorflow.keras import Model
 from tqdm import tqdm
 
-from model import create_model, compile_model
+from model import create_text_cnn, compile_model
 from model_utils import create_callbacks
 from word2vec import prepare_tokenizer, text_to_sequence
 from utils import load_glove, make_stratified_generator
 
 
-def train(generator, valid, input_shape):
-    """
-        :param x_train:
-        :param y_train:
-        :param x_valid:
-        :param y_valid:
-        :param vocab_size:
-        :param embedding_dim:
-        :param max_len:
+def get_model(input_shape: Tuple) -> Model:
+    """Instantiates a TextCNN and compiles it using a set of metrics."""
+    cnn_model = create_text_cnn(input_shape)
 
-        :return:
-    """
+    use_metrics = [
+        "binary_accuracy",
+        'TruePositives',
+        'TrueNegatives',
+        'FalsePositives',
+        'FalseNegatives',
+    ]
 
-    steps = 38
-
-    # set num filters to 36
-    num_filters = 36
-
-    # create CNN model
-    cnn_model = create_model(num_filters, input_shape)
-    # set metrics to use
-    use_metrics = ['accuracy', 'TruePositives', 'TrueNegatives',
-                   'FalsePositives', 'FalseNegatives']
     cnn_model = compile_model(cnn_model, use_metrics)
     print(cnn_model.summary())
 
+    return cnn_model
+
+
+def train(generator, steps, epochs, valid, input_shape) -> Tuple[Model, 'History']:
+    """
+    Args:
+        generator: infinite generator for Keras format.
+        steps: how many batches to use per epoch.
+        epochs: how many epochs to train.
+        valid: tuple of ndarrays (val_x, val_y)
+        input_shape: 3-tuple with input matrix shape.
+
+    Returns:
+        The trained model and its training history.
+    """
+    cnn_model = get_model(input_shape)
+
     # set callbacks to use
-    use_callbacks = ['ModelCheckpoint', 'TensorBoard', 'EarlyStopping',
-                     'ReduceLROnPlateau', 'TerminateOnNaN']
+    use_callbacks = [
+        'ModelCheckpoint',
+        'TensorBoard',
+        'EarlyStopping',
+        'ReduceLROnPlateau',
+        'TerminateOnNaN',
+    ]
 
     history = cnn_model.fit(
         generator,
         steps_per_epoch=steps,
-        epochs=10,
-        verbose=True,
+        epochs=epochs,
+        verbose=1,
         callbacks=create_callbacks(use_callbacks),
         validation_data=valid,
     )
@@ -51,13 +64,22 @@ def train(generator, valid, input_shape):
     return cnn_model, history
 
 
-def main():
+def train_driver(glove: str) -> Tuple[Model, 'History']:
+    """
+    Driver for training a TextCNN model. It performs:
+        1. Fit Tokenizer on dataset.
+        2. Convert train set words to sequences and fabricates a generator.
+        3. Convert valid set words to sequences.
+        4. Starts the training process.
 
+    Args:
+        glove: path to find glove file.
+
+    Returns:
+        The trained model and its training history.
+    """
     tokenizer = prepare_tokenizer()
-    word2seq = load_glove(
-        tokenizer.word_index,
-        '../data/glove.6B/glove.6B.300d.txt'
-    )
+    word2seq = load_glove(tokenizer.word_index, glove)
 
     print(f'Converting text from train set to sequences.')
     with open(f'../data/processed/train.json') as input_file:
@@ -65,22 +87,24 @@ def main():
 
     train_real = []
     train_fake = []
-
-    for entry_id in tqdm(dataset):
-        entry = dataset[entry_id]
+    for entry in tqdm(dataset.values()):
         sequence = text_to_sequence(
             entry['text'],
             tokenizer.word_index,
             word2seq,
         )
-
         sequence = np.asarray(sequence, dtype=np.float32)
 
         if entry['label'] == 'real':
             train_real.append(sequence)
         else:
             train_fake.append(sequence)
-    train_gen = make_stratified_generator(train_fake, train_real)
+
+    # preparing generator for training loop
+    epochs = 20
+    batch_size = 32
+    steps = max(len(train_fake), len(train_real)) // (batch_size // 2)
+    train_gen = make_stratified_generator(train_fake, train_real, batch_size)
 
     print(f'Converting text from valid set to sequences.')
     with open(f'../data/processed/valid.json') as input_file:
@@ -88,22 +112,19 @@ def main():
 
     valid_x = []
     valid_y = []
-    for entry_id in tqdm(dataset):
-        entry = dataset[entry_id]
+    for entry in tqdm(dataset.values()):
         sequence = text_to_sequence(
             entry['text'],
             tokenizer.word_index,
             word2seq,
         )
-
         valid_x.append(sequence)
         valid_y.append(0 if entry['label'] == 'fake' else 1)
-
     valid_y = np.asarray(valid_y, dtype=np.float32)
     valid_x = np.asarray(valid_x, dtype=np.float32)
 
-    model = train(train_gen, (valid_x, valid_y), (70, 300, 1))
+    return train(train_gen, steps, epochs, (valid_x, valid_y), (70, 300, 1))
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     train_driver(None)
