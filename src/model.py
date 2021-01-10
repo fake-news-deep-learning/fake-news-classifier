@@ -30,6 +30,24 @@ def create_text_cnn(input_shape: Tuple) -> Model:
     return model
 
 
+def create_lstm_model(input_shape: Tuple) -> Model:
+    """
+        :param num_filters:
+        :param input_shape:
+
+        :return:
+    """
+    embedding_dim = input_shape[1]
+
+    model = Sequential()
+    model.add(layers.InputLayer(input_shape))
+    model.add(layers.Dropout(0.5, name='dropout_layer'))
+    model.add(layers.Bidirectional(layers.LSTM(embedding_dim, name='lstm_layer')))
+    model.add(layers.Dense(1, activation='sigmoid', name='linear_layer'))
+
+    return model
+
+
 def compile_model(model_to_compile: Model, metrics_names: List[str]) -> Model:
     """Compiles a Model using given metrics names."""
 
