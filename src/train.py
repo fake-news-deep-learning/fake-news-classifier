@@ -64,7 +64,7 @@ def train(generator, steps, epochs, valid, input_shape) -> Tuple[Model, 'History
     return cnn_model, history
 
 
-def train_driver(glove: str) -> Tuple[Model, 'History']:
+def train_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
     """
     Driver for training a TextCNN model. It performs:
         1. Fit Tokenizer on dataset.
@@ -101,7 +101,6 @@ def train_driver(glove: str) -> Tuple[Model, 'History']:
             train_fake.append(sequence)
 
     # preparing generator for training loop
-    epochs = 20
     batch_size = 32
     steps = max(len(train_fake), len(train_real)) // (batch_size // 2)
     train_gen = make_stratified_generator(train_fake, train_real, batch_size)

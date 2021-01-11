@@ -8,6 +8,29 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 
 from utils import load_glove
 
+# NLTK stopwords
+stopwords = [
+    'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
+    "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves',
+    'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it',
+    "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what',
+    'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is',
+    'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do',
+    'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because',
+    'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against',
+    'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+    'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again',
+    'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all',
+    'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor',
+    'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will',
+    'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're',
+    've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't",
+    'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't",
+    'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn',
+    "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren',
+    "weren't", 'won', "won't", 'wouldn', "wouldn't"
+]
+
 
 def prepare_tokenizer() -> Tokenizer:
     """Fits a Keras Tokenizer on the dataset."""
@@ -22,18 +45,11 @@ def prepare_tokenizer() -> Tokenizer:
     tkn.fit_on_texts([entry['text'] for entry in tqdm(dataset.values())])
 
     # get words sorted by counts and remove the most commons
-    counts = sorted(
+    words = sorted(
         list(tkn.word_counts.items()),
         key=lambda x: x[1],
-        reverse=True,
     )
-    remove_top = 42
-    for i in range(1, remove_top + 1):
-        word = counts[i][0]
-        print(f'removing {word} from vocab')
-        del tkn.word_index[word]
-        del tkn.word_docs[word]
-        del tkn.word_counts[word]
+    print(f'Corpus has {len(words)} words.')
 
     # remove rare words
     rare_words = [word for word, cnt in tkn.word_counts.items() if cnt < 11]
@@ -41,6 +57,23 @@ def prepare_tokenizer() -> Tokenizer:
         del tkn.word_index[word]
         del tkn.word_docs[word]
         del tkn.word_counts[word]
+
+    rare_words_percentage = 100*len(rare_words)/len(words)
+    print(
+        f'Removed rare words, which were {rare_words_percentage:.2f}% of corpus.'
+    )
+
+    # remove stopwords
+    cnt = 0
+    for word in stopwords:
+        try:
+            del tkn.word_index[word]
+            del tkn.word_docs[word]
+            del tkn.word_counts[word]
+            cnt += 1
+        except KeyError:
+            pass
+    print(f'Succesfully removed {cnt} stopwords.')
 
     return tkn
 
