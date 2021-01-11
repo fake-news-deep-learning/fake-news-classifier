@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras import Model
 from tqdm import tqdm
 
-from model import create_text_cnn, compile_model
+from model import create_text_cnn, compile_model, create_lstm_model
 from model_utils import create_callbacks
 from word2vec import prepare_tokenizer, text_to_sequence
 from utils import load_glove, make_stratified_generator
