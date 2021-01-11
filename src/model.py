@@ -40,7 +40,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
     embedding_dim = input_shape[1]
 
     model = Sequential()
-    model.add(layers.InputLayer(input_shape))
+    model.add(layers.InputLayer(input_shape[1], input_shape[2]))
     model.add(layers.SpatialDropout1D(0.5))
     model.add(layers.LSTM(100, dropout=0.1, recurrent_dropout=0.2))
     model.add(layers.Bidirectional(layers.LSTM(64, return_sequences=True)))
