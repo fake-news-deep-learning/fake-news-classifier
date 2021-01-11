@@ -41,10 +41,18 @@ def create_lstm_model(input_shape: Tuple) -> Model:
 
     model = Sequential()
     # model.add(layers.InputLayer(input_shape[1], input_shape[2]))
-    model.add(layers.SpatialDropout1D(0.5))
+    # model.add(layers.SpatialDropout1D(0.5))
     # model.add(layers.LSTM(100, dropout=0.1, recurrent_dropout=0.2))
-    model.add(layers.LSTM(64, input_shape=(300, 1), return_sequences=True, name='lstm_1'))
-    model.add(layers.LSTM(32, input_shape=(300, 1), return_sequences=False, name='lstm_2'))
+    model.add(layers.LSTM(150,
+                          input_shape=(input_shape[1], input_shape[2]),
+                          return_sequences=True,
+                          name='lstm_1'))
+    
+    model.add(layers.LSTM(150,
+                          return_sequences=True,
+                          name='lstm_2'))
+
+    model.add(layers.Flatten())
     model.add(layers.Dense(1, activation='sigmoid', name='linear_layer'))
 
     return model
