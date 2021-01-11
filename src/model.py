@@ -43,6 +43,8 @@ def create_lstm_model(input_shape: Tuple) -> Model:
     model.add(layers.InputLayer(input_shape))
     model.add(layers.SpatialDropout1D(0.5))
     model.add(layers.LSTM(100, dropout=0.1, recurrent_dropout=0.2))
+    model.add(layers.Bidirectional(layers.LSTM(64, return_sequences=True)))
+    model.add(layers.Bidirectional(layers.LSTM(32)), return_sequences=False)
     model.add(layers.Dense(1, activation='sigmoid', name='linear_layer'))
 
     return model
