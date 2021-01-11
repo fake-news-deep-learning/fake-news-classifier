@@ -38,6 +38,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
         :return:
     """
     # embedding_dim = input_shape[1]
+    print(input_shape)
 
     model = Sequential()
     # model.add(layers.InputLayer(input_shape[1], input_shape[2]))

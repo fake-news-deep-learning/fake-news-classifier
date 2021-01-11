@@ -13,7 +13,7 @@ from utils import load_glove, make_stratified_generator
 
 def get_model(input_shape: Tuple) -> Model:
     """Instantiates a TextCNN and compiles it using a set of metrics."""
-    cnn_model = create_text_cnn(input_shape)
+    cnn_model = create_lstm_model(input_shape)
 
     use_metrics = [
         "binary_accuracy",
@@ -41,8 +41,8 @@ def train(generator, steps, epochs, valid, input_shape) -> Tuple[Model, 'History
     Returns:
         The trained model and its training history.
     """
-    # cnn_model = get_model(input_shape)
-    cnn_model = create_lstm_model(input_shape)
+    cnn_model = get_model(input_shape)
+    # cnn_model = create_lstm_model(input_shape)
 
     # set callbacks to use
     use_callbacks = [
