@@ -30,6 +30,31 @@ def create_text_cnn(input_shape: Tuple) -> Model:
     return model
 
 
+
+def create_text_deep_cnn(input_shape: Tuple) -> Model:
+    """Implements the TextCNN architecture using given input shape."""
+    filters_per_layer = 36
+    embed_size = input_shape[1]
+
+    model = Sequential()
+    model.add(layers.InputLayer(input_shape))
+
+    for kernel_size in [1, 2, 3, 3, 3, 5, 5, 5, 7]:
+        model.add(layers.Conv2D(
+            filters_per_layer,
+            (kernel_size, embed_size),
+            padding='same',
+            name=f'conv2d_kernel_{kernel_size}_layer'),
+        )
+        model.add(layers.BatchNormalization())
+
+    model.add(layers.Dropout(0.1, name='dropout_layer'))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(1, name='linear_layer', activation='sigmoid'))
+
+    return model
+
+
 def create_lstm_model(input_shape: Tuple) -> Model:
     """
         :param num_filters:

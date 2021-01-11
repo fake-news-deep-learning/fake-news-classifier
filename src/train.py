@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras import Model
 from tqdm import tqdm
 
-from model import create_text_cnn, compile_model
+from model import create_text_cnn, create_text_deep_cnn, compile_model
 from model_utils import create_callbacks
 from word2vec import prepare_tokenizer, text_to_sequence
 from utils import load_glove, make_stratified_generator
@@ -13,7 +13,7 @@ from utils import load_glove, make_stratified_generator
 
 def get_model(input_shape: Tuple) -> Model:
     """Instantiates a TextCNN and compiles it using a set of metrics."""
-    cnn_model = create_text_cnn(input_shape)
+    cnn_model = create_text_deep_cnn(input_shape)
 
     use_metrics = [
         "binary_accuracy",
