@@ -43,6 +43,7 @@ noises = {
     r'http.*://[a-z#./-]*',  # URLs
     r'www.[a-z#./-]*',  # URLs 2
     r'<.*?>',  # HTML
+    r'"',  # quotes
 }
 
 
