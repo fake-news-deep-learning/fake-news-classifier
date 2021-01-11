@@ -25,7 +25,7 @@ def create_text_cnn(input_shape: Tuple) -> Model:
 
     model.add(layers.Dropout(0.1, name='dropout_layer'))
     model.add(layers.Flatten())
-    model.add(layers.Dense(1, name='linear_layer', activation='sigmoid'))
+    model.add(layers.Dense(output_dim=1, name='linear_layer', activation='sigmoid'))
 
     return model
 
@@ -45,7 +45,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
     # model.add(layers.SpatialDropout1D(0.5))
     # model.add(layers.LSTM(100, dropout=0.1, recurrent_dropout=0.2))
     model.add(layers.LSTM(150,
-                          input_shape=(input_shape[1], input_shape[2]),
+                          input_shape=(None, input_shape[1], input_shape[2]),
                           return_sequences=True,
                           name='lstm_1'))
     
@@ -54,7 +54,9 @@ def create_lstm_model(input_shape: Tuple) -> Model:
                           name='lstm_2'))
 
     # model.add(layers.Flatten())
-    model.add(layers.Dense(1, activation='sigmoid', name='linear_layer'))
+    model.add(layers.Dense(output_dim=1,
+                           activation='sigmoid',
+                           name='linear_layer'))
 
     return model
 
