@@ -125,8 +125,6 @@ def train_driver(glove: str, epochs: int = 20, lstm=False) -> Tuple[Model, 'Hist
     valid_y = np.asarray(valid_y, dtype=np.float32)
     valid_x = np.asarray(valid_x, dtype=np.float32)
 
-    print(valid_x.shape)
-
     return train(train_gen, steps, epochs, (valid_x, valid_y), (70, 300, 1))
 
 
