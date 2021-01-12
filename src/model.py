@@ -40,15 +40,28 @@ def create_lstm_model(input_shape: Tuple) -> Model:
     # embedding_dim = input_shape[1]
     print(input_shape)
 
+    filters_per_layer = 36
+    embed_size = input_shape[1]
+
     model = Sequential()
 
-    model.add(layers.LSTM(64,
-                          batch_input_size=(None, input_shape[1], input_shape[2]),
-                          return_sequences=True))
+    model.add(layers.InputLayer(input_shape))
 
-    model.add(layers.LSTM(32))
+    for kernel_size in [1, 2, 3, 5]:
+        model.add(layers.Conv2D(
+            filters_per_layer,
+            (kernel_size, embed_size),
+            padding='same',
+            name=f'conv2d_kernel_{kernel_size}_layer'),
+        )
 
-    model.add(layers.Dense(64))
+    # model.add(layers.LSTM(64,
+    #                       batch_input_size=(None, input_shape[1], input_shape[2]),
+    #                       return_sequences=True))
+
+    model.add(layers.LSTM(100))
+
+    # model.add(layers.Dense(64))
 
     model.add(layers.Dropout(0.5))
 
