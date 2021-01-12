@@ -78,7 +78,7 @@ def prepare_tokenizer() -> Tokenizer:
     return tkn
 
 
-def text_to_sequence(text, word_index, word2seq, length=70) -> ndarray:
+def text_to_sequence(text, word_index, word2seq, length=70, mode=None) -> ndarray:
     """Converts a text to its matrix (embed_size x length) representation."""
 
     embed_size = len(word2seq[0])
@@ -97,7 +97,10 @@ def text_to_sequence(text, word_index, word2seq, length=70) -> ndarray:
     while len(sequence) < length:
         sequence.append(np.zeros(embed_size))
 
-    return np.asarray(sequence).reshape(length, embed_size, 1)
+    if mode != 'lstm':
+        return np.asarray(sequence).reshape(length, embed_size, 1)
+    else:
+        return np.asarray(sequence).reshape(length, embed_size)
 
 
 # def main():

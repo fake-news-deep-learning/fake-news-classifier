@@ -30,9 +30,8 @@ def create_text_cnn(input_shape: Tuple) -> Model:
     return model
 
 
-def create_lstm_model(input_shape: Tuple) -> Model:
+def create_lstm_model(input_shape: Tuple[int, int]) -> Model:
     """
-        :param num_filters:
         :param input_shape:
 
         :return:
@@ -41,8 +40,10 @@ def create_lstm_model(input_shape: Tuple) -> Model:
 
     model = Sequential()
     model.add(layers.InputLayer(input_shape))
-    model.add(layers.Dropout(0.5, name='dropout_layer'))
-    model.add(layers.Bidirectional(layers.LSTM(embedding_dim, name='lstm_layer')))
+    model.add(layers.Dropout(0.5, name='dropout_layer', input_shape=input_shape))
+    model.add(
+        layers.Bidirectional(layers.LSTM(embedding_dim, name='lstm_layer'))
+    )
     model.add(layers.Dense(1, activation='sigmoid', name='linear_layer'))
 
     return model
