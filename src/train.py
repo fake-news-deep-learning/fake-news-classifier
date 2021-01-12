@@ -65,7 +65,7 @@ def train(generator, steps, epochs, valid, input_shape) -> Tuple[Model, 'History
     return cnn_model, history
 
 
-def train_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
+def train_driver(glove: str, epochs: int = 20, lstm=False) -> Tuple[Model, 'History']:
     """
     Driver for training a TextCNN model. It performs:
         1. Fit Tokenizer on dataset.
@@ -93,6 +93,7 @@ def train_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
             entry['text'],
             tokenizer.word_index,
             word2seq,
+            lstm
         )
         sequence = np.asarray(sequence, dtype=np.float32)
 
@@ -117,11 +118,14 @@ def train_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
             entry['text'],
             tokenizer.word_index,
             word2seq,
+            lstm
         )
         valid_x.append(sequence)
         valid_y.append(0 if entry['label'] == 'fake' else 1)
     valid_y = np.asarray(valid_y, dtype=np.float32)
     valid_x = np.asarray(valid_x, dtype=np.float32)
+
+    print(valid_x.shape)
 
     return train(train_gen, steps, epochs, (valid_x, valid_y), (70, 300, 1))
 
