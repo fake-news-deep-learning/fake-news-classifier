@@ -42,7 +42,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
 
     model = Sequential()
 
-    model.add(layers.LSTM(150, input_shape=(input_shape[1], input_shape[2])))
+    model.add(layers.LSTM(150, input_shape=(input_shape[0], input_shape[1])))
     
     model.add(layers.Dropout(0.3))
     
