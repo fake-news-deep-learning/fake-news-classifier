@@ -93,7 +93,7 @@ def train_driver(glove: str, epochs: int = 20, lstm=False) -> Tuple[Model, 'Hist
             entry['text'],
             tokenizer.word_index,
             word2seq,
-            lstm
+            lstm=lstm
         )
         sequence = np.asarray(sequence, dtype=np.float32)
 
@@ -118,7 +118,7 @@ def train_driver(glove: str, epochs: int = 20, lstm=False) -> Tuple[Model, 'Hist
             entry['text'],
             tokenizer.word_index,
             word2seq,
-            lstm
+            lstm=lstm
         )
         valid_x.append(sequence)
         valid_y.append(0 if entry['label'] == 'fake' else 1)
