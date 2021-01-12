@@ -52,12 +52,13 @@ def create_lstm_model(input_shape: Tuple) -> Model:
             filters_per_layer,
             (kernel_size, embed_size),
             padding='same',
-            name=f'conv2d_kernel_{kernel_size}_layer'),
-        )
+            name=f'conv2d_kernel_{kernel_size}_layer'),)
 
     # model.add(layers.LSTM(64,
     #                       batch_input_size=(None, input_shape[1], input_shape[2]),
     #                       return_sequences=True))
+
+    model.add(layers.Flatten())
 
     model.add(layers.LSTM(100))
 
