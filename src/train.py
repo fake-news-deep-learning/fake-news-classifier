@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras import Model
 from tqdm import tqdm
 
-from model import create_text_cnn, compile_model
+from model import create_text_cnn, create_lstm_model, compile_model
 from model_utils import create_callbacks
 from word2vec import prepare_tokenizer, text_to_sequence
 from utils import load_glove, make_stratified_generator
@@ -117,7 +117,13 @@ def train_lstm(generator, steps, epochs, valid, input_shape) -> Tuple[Model, 'Hi
     return model, history
 
 
-def cnn_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
+def prepare_data(glove: str) -> Tuple:
+    tokenizer = prepare_tokenizer()
+    word2seq = load_glove(tokenizer.word_index, glove)
+    return tokenizer, word2seq
+
+
+def cnn_driver(tokenizer, word2seq, epochs: int = 20) -> Tuple[Model, 'History']:
     """
     Driver for training a TextCNN model. It performs:
         1. Fit Tokenizer on dataset.
@@ -178,22 +184,21 @@ def cnn_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
     return train(train_gen, steps, epochs, (valid_x, valid_y), (70, 300, 1))
 
 
-def lstm_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
+def lstm_driver(tokenizer, word2seq, epochs: int = 20) -> Tuple[Model, 'History']:
     """
     Driver for training a LSTM model. It performs:
-        1. Fit Tokenizer on dataset.
-        2. Convert train set words to sequences and fabricates a generator.
-        3. Convert valid set words to sequences.
-        4. Starts the training process.
+        1. Convert train set words to sequences and fabricates a generator.
+        2. Convert valid set words to sequences.
+        3. Starts the training process.
 
     Args:
-        glove: path to find glove file.
+        tokenizer
+        word2seq
+        epochs
 
     Returns:
         The trained model and its training history.
     """
-    tokenizer = prepare_tokenizer()
-    word2seq = load_glove(tokenizer.word_index, glove)
 
     print(f'Converting text from train set to sequences.')
     with open(f'../data/processed/train.json') as input_file:
@@ -206,6 +211,7 @@ def lstm_driver(glove: str, epochs: int = 20) -> Tuple[Model, 'History']:
             entry['text'],
             tokenizer.word_index,
             word2seq,
+            mode='lstm'
         )
         sequence = np.asarray(sequence, dtype=np.float32)
 
