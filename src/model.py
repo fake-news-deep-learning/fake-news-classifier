@@ -43,7 +43,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
     model = Sequential()
 
     model.add(layers.LSTM(64,
-                          input_shape=(input_shape[1], input_shape[2]),
+                          batch_input_size=(None, input_shape[1], input_shape[2]),
                           return_sequences=True))
 
     model.add(layers.LSTM(32))
@@ -52,24 +52,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
 
     model.add(layers.Dropout(0.5))
 
-    model.add(layers.Dense(1))
-
-    model.add(layers.Activation('sigmoid'))
-
-
-    # model.add(layers.LSTM(150,
-    #                       input_shape=(None, input_shape[1], input_shape[2]),
-    #                       return_sequences=True,
-    #                       name='lstm_1'))
-    
-    # model.add(layers.LSTM(150,
-    #                       return_sequences=True,
-    #                       name='lstm_2'))
-
-    # # model.add(layers.Flatten())
-    # model.add(layers.Dense(output_dim=1,
-    #                        activation='sigmoid',
-    #                        name='linear_layer'))
+    model.add(layers.Dense(1, activation='sigmoid'))
 
     return model
 
