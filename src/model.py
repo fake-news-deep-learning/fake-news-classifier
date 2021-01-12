@@ -42,7 +42,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
 
     model = Sequential()
 
-    model.add(layers.InputLayer(input_shape=(70, )))
+    model.add(layers.InputLayer(input_shape=(70, 300)))
 
     model.add(layers.Bidirectional(layers.LSTM(256, return_sequences=False)))
 
