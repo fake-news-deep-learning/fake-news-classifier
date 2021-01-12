@@ -52,7 +52,7 @@ def create_lstm_model(input_shape: Tuple) -> Model:
                           name='lstm_2'))
 
     # model.add(layers.Flatten())
-    model.add(layers.Dense(output_dim=1,
+    model.add(layers.Dense(1,
                            activation='sigmoid',
                            name='linear_layer'))
 
