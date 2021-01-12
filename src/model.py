@@ -44,9 +44,9 @@ def create_lstm_model(input_shape: Tuple) -> Model:
 
     model.add(layers.InputLayer(None, input_shape[0], input_shape[1]))
 
-    model.add(layers.Bidirectional(layers.LSTM(64, return_sequences=True)))
+    model.add(layers.LSTM(64, return_sequences=True))
 
-    model.add(layers.Bidirectional(layers.LSTM(32)))
+    model.add(layers.LSTM(32))
 
     model.add(layers.Dense(64))
 
