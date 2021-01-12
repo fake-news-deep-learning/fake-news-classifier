@@ -184,7 +184,7 @@ def cnn_driver(tokenizer, word2seq, epochs: int = 20) -> Tuple[Model, 'History']
     return train(train_gen, steps, epochs, (valid_x, valid_y), (70, 300, 1))
 
 
-def lstm_driver(tokenizer, word2seq, epochs: int = 20) -> Tuple[Model, 'History']:
+def lstm_driver(tokenizer, word2seq, epochs: int = 20, length=70) -> Tuple[Model, 'History']:
     """
     Driver for training a LSTM model. It performs:
         1. Convert train set words to sequences and fabricates a generator.
@@ -236,6 +236,7 @@ def lstm_driver(tokenizer, word2seq, epochs: int = 20) -> Tuple[Model, 'History'
             entry['text'],
             tokenizer.word_index,
             word2seq,
+            length=length,
             mode='lstm'
         )
         valid_x.append(sequence)
@@ -243,4 +244,4 @@ def lstm_driver(tokenizer, word2seq, epochs: int = 20) -> Tuple[Model, 'History'
     valid_y = np.asarray(valid_y, dtype=np.float32)
     valid_x = np.asarray(valid_x, dtype=np.float32)
 
-    return train_lstm(train_gen, steps, epochs, (valid_x, valid_y), (70, 300))
+    return train_lstm(train_gen, steps, epochs, (valid_x, valid_y), (length, 300))
