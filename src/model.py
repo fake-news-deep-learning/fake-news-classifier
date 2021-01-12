@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 from tensorflow.python import keras
-from keras import Model, layers
+from keras import Model, layers, backend
 from keras.models import Sequential
 
 from model_utils import create_metrics
@@ -58,9 +58,9 @@ def create_lstm_model(input_shape: Tuple) -> Model:
     #                       batch_input_size=(None, input_shape[1], input_shape[2]),
     #                       return_sequences=True))
 
-    model.add(layers.Flatten())
-
-    model.add(layers.LSTM(100))
+    squeezed = Lambda(lambda x: backend.squeeze(x, 2))(model_in)
+    # LSTM(10)(squeezed)
+    model.add(layers.LSTM(100)(squeezed))
 
     # model.add(layers.Dense(64))
 
